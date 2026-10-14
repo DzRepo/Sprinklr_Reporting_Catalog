@@ -89,7 +89,15 @@ Open [http://127.0.0.1:5050](http://127.0.0.1:5050).
 
 **Fields** searches by field name, field id, or display name. Each row is a report that can query that field, with the engine id and report name. A field page shows its characteristics, related lists, filters, and the measurements it is built from, plus other reports that include the same field.
 
-**Reports** lists engines and report names. Empty reports (no dimensions, metrics, custom dimensions, or custom metrics) are hidden until you clear **Hide empty reports**. A report page lists its fields by kind.
+![Field page for ACCOUNT_ID on CaseSLAReport, with the engine, report name, and field characteristics](AccountField.png)
+
+**Reports** lists engines and report names. Empty reports (no dimensions, metrics, custom dimensions, or custom metrics) are hidden until you clear **Hide empty reports**.
+
+![Reports for the PLATFORM engine, Social Analytics, with field counts](PlatformReports.png)
+
+A report page lists its fields by kind.
+
+![CaseSLAReport dimensions, with name, type, and whether each field can be sorted or filtered](CaseSLAReport.png)
 
 The app reads the database in read-only mode. Rebuild with `reporting_db.py build` after the catalog JSON changes, then restart the app.
 
