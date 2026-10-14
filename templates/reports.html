@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+  <h1>Reports</h1>
+  <p class="lead">Open a report to see the dimensions and metrics it supports. The engine id and report name are what a reporting query uses.</p>
+  <form class="filters" method="get" action="{{ url_for('reports') }}">
+    <label>Report or engine
+      <input type="search" name="q" value="{{ query }}" placeholder="POST_INSIGHTS or PLATFORM" autofocus>
+    </label>
+    <label>Engine
+      <select name="engine">
+        <option value="">Any</option>
+        {% for item in engines %}
+          <option value="{{ item.reporting_engine_id }}" {% if engine == item.reporting_engine_id %}selected{% endif %}>
+            {{ item.reporting_engine_id }}{% if item.reporting_engine_label and item.reporting_engine_label != item.reporting_engine_id %} — {{ item.reporting_engine_label }}{% endif %}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" name="hide_empty" value="1" {% if hide_empty %}checked{% endif %}>
+      <input type="hidden" name="hide_empty" value="0">
+      Hide empty reports
+    </label>
+    <button type="submit">Search</button>
+  </form>
+  <p class="summary">{{ total }} report{{ '' if total == 1 else 's' }}.</p>
+  {% if rows %}
+    <div class="sheet"><table>
+      <thead>
+        <tr>
+          <th>Engine</th>
+          <th>Report</th>
+          <th>Dimensions</th>
+          <th>Metrics</th>
+          <th>Custom dimensions</th>
+          <th>Custom metrics</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td><code>{{ row.reporting_engine_id }}</code>{% if row.reporting_engine_label and row.reporting_engine_label != row.reporting_engine_id %}<div class="muted">{{ row.reporting_engine_label }}</div>{% endif %}</td>
+            <td><a href="{{ url_for('report_detail', engine=row.reporting_engine_id, report=row.report_name) }}">{{ row.report_name }}</a></td>
+            <td>{{ row.dimension }}</td>
+            <td>{{ row.metric }}</td>
+            <td>{{ row.custom_dimension }}</td>
+            <td>{{ row.custom_metric }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+    {% include "pager.html" %}
+  {% else %}
+    <p class="empty">No reports matched.</p>
+  {% endif %}
+{% endblock %}

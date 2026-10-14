@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+sprinklr_auth.yaml
+reporting_catalog/
+*.sqlite

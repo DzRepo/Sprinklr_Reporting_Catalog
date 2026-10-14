@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Find a field{% endblock %}
+{% block content %}
+  <h1>Find a field</h1>
+  <p class="lead">Search by field name, field id, or display name. Each row is a report that can query that field, with the engine and report name to use.</p>
+  <form class="filters" method="get" action="{{ url_for('fields') }}">
+    <label>Field
+      <input type="search" name="q" value="{{ query }}" placeholder="date, engagement, ACCOUNT_ID" autofocus>
+    </label>
+    <label>Kind
+      <select name="kind">
+        <option value="">Any</option>
+        {% for value, label in kinds.items() %}
+          <option value="{{ value }}" {% if kind == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Engine
+      <select name="engine">
+        <option value="">Any</option>
+        {% for item in engines %}
+          <option value="{{ item.reporting_engine_id }}" {% if engine == item.reporting_engine_id %}selected{% endif %}>
+            {{ item.reporting_engine_id }}{% if item.reporting_engine_label and item.reporting_engine_label != item.reporting_engine_id %} — {{ item.reporting_engine_label }}{% endif %}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Report
+      <input type="text" name="report" value="{{ report }}" placeholder="POST_INSIGHTS">
+    </label>
+    <label class="check">
+      <input type="checkbox" name="hidden" value="1" {% if include_hidden %}checked{% endif %}>
+      Include hidden
+    </label>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if not query and not engine and not report and not kind %}
+    <p class="empty">Enter part of a field name, such as <a href="{{ url_for('fields', q='date', kind='dimension') }}">date</a>, or browse <a href="{{ url_for('reports') }}">reports</a>.</p>
+  {% else %}
+    <p class="summary">{{ total }} field{{ '' if total == 1 else 's' }} across {{ report_total }} report{{ '' if report_total == 1 else 's' }}.</p>
+    {% if rows %}
+      <div class="sheet"><table>
+        <thead>
+          <tr>
+            <th>Engine</th>
+            <th>Report</th>
+            <th>Kind</th>
+            <th>Name</th>
+            <th>Display name</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td><code>{{ row.reporting_engine_id }}</code></td>
+              <td><a href="{{ url_for('report_detail', engine=row.reporting_engine_id, report=row.report_name) }}">{{ row.report_name }}</a></td>
+              <td>{{ row.kind | kind_label }}</td>
+              <td><a href="{{ url_for('field_detail', field_id=row.id) }}"><code>{{ row.name or row.field_name }}</code></a></td>
+              <td>{{ row.display_name }}</td>
+              <td>{{ row.field_type }}</td>
+              <td class="clip">{{ row.description }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+      {% include "pager.html" %}
+    {% else %}
+      <p class="empty">No fields matched.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

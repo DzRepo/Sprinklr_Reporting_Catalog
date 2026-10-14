@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ field.display_name or field.name }}{% endblock %}
+{% block content %}
+  <p class="crumb"><a href="{{ url_for('fields', q=field.name, kind=field.kind) }}">Fields</a></p>
+  <h1>{{ field.display_name or field.name }}</h1>
+  <p class="lead">{{ field.kind | kind_label }}{% if field.description %} — {{ field.description }}{% endif %}</p>
+  <section class="callout">
+    <h2>Use this in a query</h2>
+    <dl>
+      <div><dt>Reporting engine</dt><dd><code>{{ field.reporting_engine_id }}</code>{% if engine_label and engine_label != field.reporting_engine_id %} <span class="muted">{{ engine_label }}</span>{% endif %}</dd></div>
+      <div><dt>Report name</dt><dd><a href="{{ url_for('report_detail', engine=field.reporting_engine_id, report=field.report_name) }}"><code>{{ field.report_name }}</code></a></dd></div>
+      <div><dt>Field name</dt><dd><code>{{ field.name }}</code></dd></div>
+      {% if field.field_name and field.field_name != field.name %}
+        <div><dt>Stored field</dt><dd><code>{{ field.field_name }}</code></dd></div>
+      {% endif %}
+    </dl>
+  </section>
+
+  <h2>Characteristics</h2>
+  <div class="sheet"><table class="facts">
+    <tbody>
+      <tr><th>Kind</th><td>{{ field.kind | kind_label }}</td></tr>
+      <tr><th>Type</th><td>{{ field.field_type }}</td></tr>
+      <tr><th>Data type</th><td>{{ field.data_type }}</td></tr>
+      <tr><th>Unique key</th><td><code>{{ field.unique_key }}</code></td></tr>
+      <tr><th>Code</th><td><code>{{ field.code }}</code></td></tr>
+      <tr><th>Sortable</th><td>{{ field.sortable | yn }}</td></tr>
+      <tr><th>Filterable</th><td>{{ field.filterable | yn }}</td></tr>
+      <tr><th>Hidden</th><td>{{ field.hidden | yn }}</td></tr>
+    </tbody>
+  </table></div>
+
+  {% if lists %}
+    <h2>Related lists</h2>
+    {% for label, values in lists %}
+      <h3>{{ label }}</h3>
+      <ul class="tags">
+        {% for value in values %}
+          <li>{{ value }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% endif %}
+
+  {% if filters %}
+    <h2>Filters</h2>
+    <div class="sheet"><table>
+      <thead><tr><th>Field</th><th>Type</th><th>Values</th></tr></thead>
+      <tbody>
+        {% for item in filters %}
+          <tr>
+            <td>{% if item.field_name %}<a href="{{ url_for('fields', q=item.field_name) }}"><code>{{ item.field_name }}</code></a>{% endif %}</td>
+            <td>{{ item.filter_type }}</td>
+            <td>{{ item.filter_values | join(', ') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+  {% endif %}
+
+  {% if projections %}
+    <h2>Built from</h2>
+    <div class="sheet"><table>
+      <thead><tr><th>Measurement</th><th>Aggregate</th></tr></thead>
+      <tbody>
+        {% for item in projections %}
+          <tr>
+            <td>{% if item.measurement %}<a href="{{ url_for('fields', q=item.measurement, kind='metric') }}"><code>{{ item.measurement }}</code></a>{% endif %}</td>
+            <td>{{ item.aggregate_function }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+  {% endif %}
+
+  {% if other_count %}
+    <h2>Same field on other reports</h2>
+    <p class="summary">{{ other_count }} other report{{ '' if other_count == 1 else 's' }} include <code>{{ field.name }}</code> as a {{ field.kind | kind_label | lower }}.</p>
+    <div class="sheet"><table>
+      <thead><tr><th>Engine</th><th>Report</th><th>Display name</th></tr></thead>
+      <tbody>
+        {% for row in others %}
+          <tr>
+            <td><code>{{ row.reporting_engine_id }}</code></td>
+            <td><a href="{{ url_for('report_detail', engine=row.reporting_engine_id, report=row.report_name) }}">{{ row.report_name }}</a></td>
+            <td><a href="{{ url_for('field_detail', field_id=row.id) }}">{{ row.display_name }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+    {% if other_count > others|length %}
+      <p class="muted">Showing the first {{ others|length }}.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

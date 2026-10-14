@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ report.report_name }}{% endblock %}
+{% block content %}
+  <p class="crumb"><a href="{{ url_for('reports', engine=report.reporting_engine_id) }}">Reports</a></p>
+  <h1>{{ report.report_name }}</h1>
+  <section class="callout">
+    <h2>Use this in a query</h2>
+    <dl>
+      <div><dt>Reporting engine</dt><dd><code>{{ report.reporting_engine_id }}</code>{% if report.reporting_engine_label and report.reporting_engine_label != report.reporting_engine_id %} <span class="muted">{{ report.reporting_engine_label }}</span>{% endif %}</dd></div>
+      <div><dt>Report name</dt><dd><code>{{ report.report_name }}</code></dd></div>
+    </dl>
+  </section>
+  <nav class="jump">
+    {% for value, label in kinds.items() %}
+      <a href="#{{ value }}">{{ label }} ({{ grouped[value]|length }})</a>
+    {% endfor %}
+  </nav>
+  {% for value, label in kinds.items() %}
+    <h2 id="{{ value }}">{{ label }}</h2>
+    {% if grouped[value] %}
+      <div class="sheet"><table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Display name</th>
+            <th>Type</th>
+            <th>Sortable</th>
+            <th>Filterable</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in grouped[value] %}
+            <tr>
+              <td><a href="{{ url_for('field_detail', field_id=row.id) }}"><code>{{ row.name or row.field_name }}</code></a></td>
+              <td>{{ row.display_name }}</td>
+              <td>{{ row.field_type }}</td>
+              <td>{{ row.sortable | yn }}</td>
+              <td>{{ row.filterable | yn }}</td>
+              <td class="clip">{{ row.description }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <p class="empty">None.</p>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

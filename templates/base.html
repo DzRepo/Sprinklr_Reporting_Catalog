@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Reporting catalog{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='explorer.css') }}?v=3">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="{{ url_for('fields') }}">Reporting catalog</a>
+    <nav>
+      <a href="{{ url_for('fields') }}" {% if request.endpoint == 'fields' or request.endpoint == 'field_detail' %}aria-current="page"{% endif %}>Fields</a>
+      <a href="{{ url_for('reports') }}" {% if request.endpoint == 'reports' or request.endpoint == 'report_detail' %}aria-current="page"{% endif %}>Reports</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

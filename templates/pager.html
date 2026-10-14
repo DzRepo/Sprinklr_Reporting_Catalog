@@ -1,0 +1,11 @@
+{% if pages > 1 %}
+  <nav class="pager" aria-label="Pages">
+    {% if page > 1 %}
+      <a href="{{ page_url(page - 1) }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}
+      <a href="{{ page_url(page + 1) }}">Next</a>
+    {% endif %}
+  </nav>
+{% endif %}
